@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        background: #f4f6f9;
+    }
+
+    .book-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .1);
+        overflow: hidden;
+        transition: .3s;
+    }
+
+    .book-card:hover {
+        transform: scale(1.02);
+    }
+
+    .book-img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .info-box {
+        background: #eef2f7;
+        padding: 12px;
+        border: 1px solid #d9dfe6;
+        font-weight: 500;
+    }
+
+    .less-pages {
+        background: #ffe5e5;
+    }
+
+    .more-pages {
+        background: #e7f7ee;
+    }
+
+    .added {
+        background: #6c757d;
+        pointer-events: none;
+    }
+</style>
+</head>
+<body>
+  <div id="app">
+    <nav class="navbar navbar-dark bg-dark navbar-expand">
+        <div class="container">
+            <a class="navbar-brand">Library</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @click="page='books'">Books</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @click="page='wishlist'">Wish List</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+<div class="container mt-4">
+<div v-if="page=='books'">
+<div class="row">
+<div class="col-md-4 mb-4" v-for="book in books" :key="book.Name">
+    <div class="book-card bg-white">
+        <img :src="book.image" class="w-100 book-img">
+        <div class="p-3">
+            <h5>{{book.Name}}</h5>
+            <div class="row text-center mt-3">
+                <div class="col-6 info-box">
+                    Category
+                    <br>
+                    {{book.category}}
+                </div>
+                <div class="col-6 info-box">
+                    Author
+                    <br>
+                    {{book.author}}
+                </div>
+                <div class="col-6 info-box"
+                    :class="book.numberofpage < 50 ? 'less-pages':'more-pages'">
+                    Pages
+                    <br>
+                    {{book.numberofpage}}
+                </div>
+                <div class="col-6 info-box">
+                    Price
+                    <br>
+                    {{formatPrice(book.price)}}
+                </div>
+            </div>
+           <div class="d-flex justify-content-between mt-3">
+                <button class="btn" :class="book.added ? 'btn-secondary added' : 'btn-primary'"
+                    @click="addToWish(book)">
+                    {{ book.added ? "Added" : "Add To List" }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+    <div v-if="page=='wishlist'">
+        <h3 class="mb-3">Wish List</h3>
+        <table class="table table-bordered bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Author</th>
+                    <th>Pages</th>
+                    <th>Price</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(book,index) in wishlist" :key="index">
+                    <td>{{book.Name}}</td>
+                    <td>{{book.author}}</td>
+                    <td>{{book.numberofpage}}</td>
+                    <td>{{formatPrice(book.price)}}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @click="removeBook(book,index)">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-if="wishlist.length==0">
+            No books added yet
+           </p>
+         </div>
+      </div>
+  </div>
+    <script>
+const { createApp, ref } = Vue
+createApp({
+setup() {
+    const page = ref('books')
+    const books = ref([
+        {
+            Name: "The House of Mirth",
+            image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1328729186i/17728.jpg",
+            category: "Classics",
+            author: "Edith",
+            price: 150,
+            numberofpage: 40,
+            added: false
+        },
+        {
+            Name: "The Sun Also Rises",
+            image: "https://upload.wikimedia.org/wikipedia/commons/8/8b/The_Sun_Also_Rises_%281st_ed._cover%29.jpg",
+            category: "Fantasy",
+            author: "John",
+            price: 200,
+            numberofpage: 50,
+            added: false
+        },
+        {
+            Name: "Brave New World", description: "Evelyn Waugh's second novel...",
+            image: "https://upload.wikimedia.org/wikipedia/en/6/62/BraveNewWorld_FirstEdition.jpg",
+            category: "Mystery",
+            author: "James",
+            price: 500,
+            numberofpage: 110,
+            added: false
+
+        },
+        {
+            Name: "Rosemary and Rue",
+            description: "Evelyn Waugh's second novel...",
+            image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1406866868i/6294549.jpg",
+            category: "Poetry",
+            author: "David",
+            price: 550,
+            numberofpage: 120,
+            added: false
+        },
+        {
+            Name: "Pale Fire",
+            description: "Evelyn Waugh's second novel...",
+            image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1388155863i/7805.jpg",
+            category: "Romance",
+            author: "Linda",
+            price: 600,
+            numberofpage: 130,
+            added: false
+        },
+        {
+            Name: "Behold, Here's Poison",
+            description: "Evelyn Waugh's second novel...",
+            image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1320460133i/311135.jpg",
+            category: "Fantasy",
+            author: "Veronica",
+            price: 40,
+            numberofpage: 170,
+            added: false
+        },
+        {
+            Name: "Band of Brothers",
+            description: "Evelyn Waugh's second novel...",
+            image: "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1388247701i/42389.jpg",
+            category: "Crime",
+            author: "Gillian",
+            price: 70,
+            numberofpage: 180,
+            added: false
+        },
+    ])
+    const wishlist = ref([])
+    const addToWish = (book) => {
+        if (!book.added) {
+            wishlist.value.push(book)
+            book.added = true
+        }
+    }
+    const removeBook = (book, index) => {
+        wishlist.value.splice(index, 1)
+        book.added = false
+    }
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('ar-SA', {
+            style: 'currency',
+            currency: 'SAR'
+        }).format(price)
+    }
+    return {
+        page,
+        books,
+        wishlist,
+        addToWish,
+        removeBook,
+        formatPrice
+    }
+    }
+
+    }).mount("#app")
+    </script>
+
+</body>
+
+</html>
